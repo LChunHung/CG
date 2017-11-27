@@ -16,7 +16,6 @@
 body {
   overflow: hidden;
 }
-
 </style>
 </head>
 
@@ -25,7 +24,8 @@ body {
   <br/> 
   <button id="restart" style="width:20%">Restart</button>
   <button id="toggle" style="width:20%">Toggle Turn</button>
-  <button id="change" style="width:20%">Change style</button>
+  <button id="changeP" style="width:20%">Change style</button>
+  <button id="changeS" style="width:20%">Analog/Digital</button>
 </div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r78/three.min.js"></script>
 <script src="https://threejs.org/examples/js/controls/OrbitControls.js">
@@ -37,25 +37,28 @@ var scene, renderer, camera;
 var controls;
 var mesh, angle = 0,
   turn = false;
-var hue = 0;
-var obj3d, pin, pin2,circle, ring;
-var style = false;
+var obj3d, pin, pin2,circle, ring, time = 0;
+var styleP = false;
+var styleS = false;
 
 init();
 animate();
+$("#changeS").click(function() {
+  styleS = ! styleS;
+});
 $("#restart").click(function() {
   angle = 0;
   turn = 0;
 });
-$("#change").click(function() {
-	style = !style;
-	if(style == 0){
+$("#changeP").click(function() {
+	styleP = !styleP;
+	if(styleP == 0){
   	circle.visible = true;
   	obj3d.visible = true;
     pin2.visible = false;
     ring.visible = false;
   }
-  if(style == 1){
+  if(styleP == 1){
   	circle.visible = false;
   	obj3d.visible = false;
     pin2.visible = true;
@@ -125,20 +128,23 @@ function onWindowResize() {
 
 function animate() {
   controls.update();
-  if (turn) {
-    angle -= 0.00175;
+  if (turn && styleS) {
+  	angle -= Math.PI/300;
   	angle %= Math.PI*2;
+    time = 100;
+  }
+  if (turn && !styleS) {
+    angle -= Math.PI/30;
+ 		angle %= Math.PI*2;
+    time = 1000;
   }
   
   obj3d.rotation.z = angle;
   pin2.geometry = new THREE.CircleGeometry (100, 320, Math.PI/2, angle);
 
-  // mesh.material.color.setHSL (hue, hue, .8)
-  requestAnimationFrame(animate);
+  setTimeout(animate, time);
   renderer.render(scene, camera);
 }
-
-
 </script>
 </body>
 
